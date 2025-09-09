@@ -14,6 +14,7 @@ import tempfile
 import hashlib
 from passlib.context import CryptContext
 import jwt
+import json
 
 # Load environment variables
 ROOT_DIR = Path(__file__).parent
