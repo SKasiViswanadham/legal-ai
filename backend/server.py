@@ -286,7 +286,7 @@ async def analyze_document(document_id: str, file_path: str, content_type: str):
 
 @api_router.get("/documents")
 async def get_user_documents(user_id: str = Depends(verify_token)):
-    documents = await db.documents.find({"user_id": user_id}).sort("uploaded_at", -1).to_list(100)
+    documents = await db.documents.find({"user_id": user_id}, {"_id": 0}).sort("uploaded_at", -1).to_list(100)
     return documents
 
 @api_router.get("/documents/{document_id}/analysis")
