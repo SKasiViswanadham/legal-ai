@@ -4,8 +4,18 @@ import axios from 'axios';
 import './App.css';
 
 // Components
+import Header from './components/Header';
+import Footer from './components/Footer';
+import HomePage from './components/HomePage';
+import FeaturesPage from './components/FeaturesPage';
+import AboutPage from './components/AboutPage';
+import SupportPage from './components/SupportPage';
+import ContactPage from './components/ContactPage';
+import PricingPage from './components/PricingPage';
+import UseCasesPage from './components/UseCasesPage';
 import LoginPage from './components/LoginPage';
 import Dashboard from './components/Dashboard';
+import UploadPage from './components/UploadPage';
 import DocumentAnalysis from './components/DocumentAnalysis';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -55,22 +65,97 @@ function App() {
     <div className="App">
       <BrowserRouter>
         <Routes>
-          <Route 
-            path="/login" 
-            element={!token ? <LoginPage onLogin={handleLogin} /> : <Navigate to="/dashboard" />} 
-          />
-          <Route 
-            path="/dashboard" 
-            element={token ? <Dashboard onLogout={handleLogout} /> : <Navigate to="/login" />} 
-          />
-          <Route 
-            path="/document/:documentId" 
-            element={token ? <DocumentAnalysis /> : <Navigate to="/login" />} 
-          />
-          <Route 
-            path="/" 
-            element={<Navigate to={token ? "/dashboard" : "/login"} />} 
-          />
+          {/* Public Routes */}
+          <Route path="/" element={
+            <>
+              <Header isAuthenticated={!!token} onLogout={handleLogout} />
+              <HomePage />
+              <Footer />
+            </>
+          } />
+          
+          <Route path="/features" element={
+            <>
+              <Header isAuthenticated={!!token} onLogout={handleLogout} />
+              <FeaturesPage />
+              <Footer />
+            </>
+          } />
+          
+          <Route path="/about" element={
+            <>
+              <Header isAuthenticated={!!token} onLogout={handleLogout} />
+              <AboutPage />
+              <Footer />
+            </>
+          } />
+          
+          <Route path="/support" element={
+            <>
+              <Header isAuthenticated={!!token} onLogout={handleLogout} />
+              <SupportPage />
+              <Footer />
+            </>
+          } />
+          
+          <Route path="/contact" element={
+            <>
+              <Header isAuthenticated={!!token} onLogout={handleLogout} />
+              <ContactPage />
+              <Footer />
+            </>
+          } />
+          
+          <Route path="/pricing" element={
+            <>
+              <Header isAuthenticated={!!token} onLogout={handleLogout} />
+              <PricingPage />
+              <Footer />
+            </>
+          } />
+          
+          <Route path="/use-cases" element={
+            <>
+              <Header isAuthenticated={!!token} onLogout={handleLogout} />
+              <UseCasesPage />
+              <Footer />
+            </>
+          } />
+          
+          <Route path="/login" element={
+            !token ? <LoginPage onLogin={handleLogin} /> : <Navigate to="/dashboard" />
+          } />
+          
+          {/* Protected Routes */}
+          <Route path="/dashboard" element={
+            token ? (
+              <>
+                <Header isAuthenticated={true} onLogout={handleLogout} />
+                <Dashboard onLogout={handleLogout} />
+                <Footer />
+              </>
+            ) : <Navigate to="/login" />
+          } />
+          
+          <Route path="/upload" element={
+            token ? (
+              <>
+                <Header isAuthenticated={true} onLogout={handleLogout} />
+                <UploadPage />
+                <Footer />
+              </>
+            ) : <Navigate to="/login" />
+          } />
+          
+          <Route path="/document/:documentId" element={
+            token ? (
+              <>
+                <Header isAuthenticated={true} onLogout={handleLogout} />
+                <DocumentAnalysis />
+                <Footer />
+              </>
+            ) : <Navigate to="/login" />
+          } />
         </Routes>
       </BrowserRouter>
     </div>
