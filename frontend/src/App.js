@@ -1,50 +1,76 @@
-import { useEffect } from "react";
-import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import axios from 'axios';
+import './App.css';
+
+// Components
+import LoginPage from './components/LoginPage';
+import Dashboard from './components/Dashboard';
+import DocumentAnalysis from './components/DocumentAnalysis';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
-
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
-
-  return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
-};
+// Set up axios defaults
+axios.defaults.headers.common['Content-Type'] = 'application/json';
 
 function App() {
+  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [userId, setUserId] = useState(localStorage.getItem('userId'));
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Set auth header if token exists
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    }
+    setLoading(false);
+  }, [token]);
+
+  const handleLogin = (accessToken, userId) => {
+    setToken(accessToken);
+    setUserId(userId);
+    localStorage.setItem('token', accessToken);
+    localStorage.setItem('userId', userId);
+    axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+  };
+
+  const handleLogout = () => {
+    setToken(null);
+    setUserId(null);
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    delete axios.defaults.headers.common['Authorization'];
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="App">
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
+          <Route 
+            path="/login" 
+            element={!token ? <LoginPage onLogin={handleLogin} /> : <Navigate to="/dashboard" />} 
+          />
+          <Route 
+            path="/dashboard" 
+            element={token ? <Dashboard onLogout={handleLogout} /> : <Navigate to="/login" />} 
+          />
+          <Route 
+            path="/document/:documentId" 
+            element={token ? <DocumentAnalysis /> : <Navigate to="/login" />} 
+          />
+          <Route 
+            path="/" 
+            element={<Navigate to={token ? "/dashboard" : "/login"} />} 
+          />
         </Routes>
       </BrowserRouter>
     </div>
