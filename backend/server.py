@@ -292,11 +292,11 @@ async def get_user_documents(user_id: str = Depends(verify_token)):
 @api_router.get("/documents/{document_id}/analysis")
 async def get_document_analysis(document_id: str, user_id: str = Depends(verify_token)):
     # Verify document belongs to user
-    document = await db.documents.find_one({"id": document_id, "user_id": user_id})
+    document = await db.documents.find_one({"id": document_id, "user_id": user_id}, {"_id": 0})
     if not document:
         raise HTTPException(status_code=404, detail="Document not found")
     
-    analysis = await db.document_analyses.find_one({"document_id": document_id})
+    analysis = await db.document_analyses.find_one({"document_id": document_id}, {"_id": 0})
     if not analysis:
         raise HTTPException(status_code=404, detail="Analysis not found")
     
